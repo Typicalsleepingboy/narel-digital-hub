@@ -1,5 +1,5 @@
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
+import Hero from "@/components/home";
 import ProductGrid from "@/components/ProductGrid";
 import PaymentMethods from "@/components/PaymentMethods";
 import TermsSection from "@/components/TermsSection";

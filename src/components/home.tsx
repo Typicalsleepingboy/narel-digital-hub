@@ -1,13 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Star } from "lucide-react";
-import heroImage from "@/assets/hero-digital-products.jpg";
+import {  Star } from "lucide-react";
+import heroImage from "@/assets/narel.png";
 
 const Hero = () => {
   return (
     <section id="home" className="pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center space-y-12">
-          {/* Large Hero Banner Image */}
           <div className="relative mx-auto max-w-5xl">
             <div className="absolute inset-0 bg-gradient-hero rounded-3xl opacity-20 blur-3xl"></div>
             <img 
@@ -26,25 +24,13 @@ const Hero = () => {
               </div>
               
               <h1 className="text-5xl lg:text-7xl font-display font-bold text-foreground leading-tight">
-                NareL
-                <span className="bg-gradient-hero bg-clip-text text-transparent"> Digital</span>
+                NareL Digital
               </h1>
               
               <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
                 A leading digital brand established in 2022, providing top-quality digital products and services at affordable prices.
               </p>
-            </div>
-            
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg" className="group px-8 py-3">
-                Explore Products
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button variant="outline" size="lg" className="px-8 py-3">
-                Learn More
-              </Button>
-            </div>
+            </div>  
             
             {/* Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-16">

@@ -45,7 +45,7 @@ const Footer = () => {
         
         <div className="border-t border-primary-foreground/20 pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <p className="text-sm text-primary-foreground/80">
-            © 2024 NareL Digital. All rights reserved.
+            © {new Date().getFullYear()} NareL Digital. All rights reserved.
           </p>
           <div className="flex items-center space-x-1 text-sm text-primary-foreground/80">
             <span>Made with</span>

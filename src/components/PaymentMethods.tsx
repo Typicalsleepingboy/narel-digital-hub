@@ -2,69 +2,62 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 
 const PaymentMethods = () => {
   const paymentMethods = [
     {
-      name: "Bank Transfer",
-      logo: "https://via.placeholder.com/120x60/3b82f6/ffffff?text=Bank+Transfer",
-      description: "Transfer bank lokal"
-    },
-    {
-      name: "GoPay",
-      logo: "https://via.placeholder.com/120x60/00aa5b/ffffff?text=GoPay",
-      description: "E-wallet GoPay"
-    },
-    {
-      name: "OVO",
-      logo: "https://via.placeholder.com/120x60/4c1a85/ffffff?text=OVO",
-      description: "E-wallet OVO"
+      name: "BCA",
+      logo: "https://www.bca.co.id/-/media/Feature/Card/List-Card/Tentang-BCA/Brand-Assets/Logo-BCA/Logo-BCA_Biru.png",
+      description: "Bank Central Asia",
     },
     {
       name: "DANA",
-      logo: "https://via.placeholder.com/120x60/118ab2/ffffff?text=DANA",
-      description: "E-wallet DANA"
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/200px-Logo_dana_blue.svg.png",
+      description: "E-wallet DANA",
     },
     {
-      name: "LinkAja",
-      logo: "https://via.placeholder.com/120x60/dc2626/ffffff?text=LinkAja",
-      description: "E-wallet LinkAja"
+      name: "GoPay",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Gopay_logo.svg/200px-Gopay_logo.svg.png",
+      description: "E-wallet GoPay",
+    },
+    {
+      name: "OVO",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Logo_ovo_purple.svg/200px-Logo_ovo_purple.svg.png",
+      description: "E-wallet OVO",
     },
     {
       name: "ShopeePay",
-      logo: "https://via.placeholder.com/120x60/f97316/ffffff?text=ShopeePay",
-      description: "E-wallet ShopeePay"
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Shopee.svg/200px-Shopee.svg.png",
+      description: "E-wallet ShopeePay",
     },
     {
       name: "QRIS",
-      logo: "https://via.placeholder.com/120x60/059669/ffffff?text=QRIS",
-      description: "Scan QR code"
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/QRIS_logo.svg/200px-QRIS_logo.svg.png",
+      description: "Scan QR code",
     },
     {
-      name: "Indomaret",
-      logo: "https://via.placeholder.com/120x60/eab308/ffffff?text=Indomaret",
-      description: "Bayar di Indomaret"
+      name: "PayPal",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/200px-PayPal.svg.png",
+      description: "Pembayaran global",
     },
     {
-      name: "Alfamart",
-      logo: "https://via.placeholder.com/120x60/dc2626/ffffff?text=Alfamart",
-      description: "Bayar di Alfamart"
+      name: "Crypto",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/200px-Bitcoin.svg.png",
+      description: "Cryptocurrency",
     }
   ];
 
   return (
-    <section className="py-16 px-4 bg-secondary/30">
+    <section className="py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold text-primary mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
             Metode Pembayaran
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Berbagai pilihan pembayaran untuk kemudahan Anda
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Berbagai pilihan pembayaran untuk kemudahan dan kenyamanan transaksi Anda
           </p>
         </div>
 
@@ -73,37 +66,46 @@ const PaymentMethods = () => {
             opts={{
               align: "start",
               loop: true,
+              skipSnaps: false,
+              dragFree: true,
             }}
             className="w-full"
           >
             <CarouselContent className="-ml-2 md:-ml-4">
               {paymentMethods.map((method, index) => (
                 <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
-                  <Card className="h-full hover:shadow-md transition-shadow">
-                    <CardContent className="flex flex-col items-center justify-center p-6 text-center space-y-3">
-                      <img
-                        src={method.logo}
-                        alt={method.name}
-                        className="w-24 h-12 object-contain rounded-md"
-                      />
+                  <Card className="h-full border border-gray-200/60 hover:border-blue-300 hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden bg-white">
+                    <CardContent className="flex flex-col items-center justify-center p-5 text-center space-y-3">
+                      <div className="w-16 h-16 flex items-center justify-center p-2 bg-white rounded-lg">
+                        <img
+                          src={method.logo}
+                          alt={method.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
                       <div>
-                        <h3 className="font-semibold text-sm">{method.name}</h3>
-                        <p className="text-xs text-muted-foreground">{method.description}</p>
+                        <h3 className="font-semibold text-gray-800">{method.name}</h3>
+                        <p className="text-xs text-gray-500 mt-1">{method.description}</p>
                       </div>
                     </CardContent>
                   </Card>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
           </Carousel>
         </div>
 
-        <div className="text-center mt-8">
-          <p className="text-sm text-muted-foreground">
-            Pembayaran aman dan terpercaya ✓ Proses otomatis 24/7 ✓
-          </p>
+        <div className="text-center mt-12">
+          <div className="inline-flex items-center space-x-2 bg-blue-50 rounded-full py-2 px-4 border border-blue-100">
+            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-500">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <p className="text-sm text-blue-700">
+              Pembayaran aman dan terpercaya • Proses otomatis 24/7
+            </p>
+          </div>
         </div>
       </div>
     </section>
