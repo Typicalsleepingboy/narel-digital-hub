@@ -20,14 +20,14 @@ const Navbar = () => {
           <a href="#terms" className="text-foreground hover:text-primary transition-colors">
             Terms
           </a>
+          <a href="/admin" className="text-foreground hover:text-primary transition-colors">
+            Admin
+          </a>
         </div>
         
         <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="sm">
-            Login
-          </Button>
           <Button variant="accent" size="sm">
-            Get Started
+            Go to Discord
           </Button>
         </div>
       </div>

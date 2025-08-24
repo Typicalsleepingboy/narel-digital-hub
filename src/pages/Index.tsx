@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
+import PaymentMethods from "@/components/PaymentMethods";
 import TermsSection from "@/components/TermsSection";
 import Footer from "@/components/Footer";
 
@@ -10,6 +11,7 @@ const Index = () => {
       <Navbar />
       <Hero />
       <ProductGrid />
+      <PaymentMethods />
       <TermsSection />
       <Footer />
     </div>
