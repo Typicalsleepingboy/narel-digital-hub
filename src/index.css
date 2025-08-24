@@ -104,6 +104,7 @@ All colors MUST be HSL.
     --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
+}
 
 @layer base {
   * {
