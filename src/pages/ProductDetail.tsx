@@ -302,22 +302,22 @@ export default function ProductDetail() {
                                                         selectedVariant?.id === variant.id
                                                             ? 'border-primary bg-primary/5'
                                                             : variant.is_available 
-                                                                ? 'border-border hover:border-primary/50 cursor-pointer'
-                                                                : 'border-border/30 bg-muted/30 cursor-not-allowed opacity-60'
+                                                                ? 'border-border hover:border-primary/50 hover:bg-primary/5 cursor-pointer'
+                                                                : 'border-red-200 bg-red-50/50 cursor-not-allowed opacity-60 pointer-events-none'
                                                     }`}
                                                 >
                                                     <div className="flex flex-col items-start">
                                                         <div className="flex items-center space-x-2">
-                                                            <span className={`font-medium ${!variant.is_available ? 'text-muted-foreground' : ''}`}>
+                                                            <span className={`font-medium ${!variant.is_available ? 'text-red-500 line-through' : ''}`}>
                                                                 {variant.variant_name}
                                                             </span>
                                                             {!variant.is_available && (
-                                                                <Badge variant="secondary" className="text-xs bg-red-100 text-red-700 border-red-200">
-                                                                    Not Available
+                                                                <Badge variant="destructive" className="text-xs bg-red-500 text-white border-red-500">
+                                                                    Sold Out
                                                                 </Badge>
                                                             )}
                                                         </div>
-                                                        <span className="text-sm text-muted-foreground">
+                                                        <span className={`text-sm ${!variant.is_available ? 'text-red-400 line-through' : 'text-muted-foreground'}`}>
                                                             Rp {variant.price.toLocaleString('id-ID')}
                                                             {variant.discount_percentage && (
                                                                 <span className="ml-2 line-through opacity-70">
