@@ -2,7 +2,31 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ProductCard from "./ProductCard";
 
+interface ProductVariant {
+  id: string;
+  product_id: string;
+  variant_name: string;
+  price: number; 
+  price_adjustment: number;
+  discount_percentage?: number | null; 
+  is_available: boolean; 
+  created_at: string;
+  updated_at: string;
+}
+
 interface Product {
+  id: string;
+  name: string;
+  price: number;
+  discount: boolean;
+  discount_percentage?: number;
+  description: string | null;
+  images: string[] | null;
+  created_at: string;
+  variants?: ProductVariant[];
+}
+
+interface DatabaseProduct {
   id: string;
   name: string;
   price: number;
@@ -23,13 +47,31 @@ const ProductGrid = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: productsData, error: productsError } = await supabase
         .from('products')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setProducts(data || []);
+      if (productsError) throw productsError;
+
+      // Fetch variants for each product
+      const productsWithVariants = await Promise.all(
+        (productsData || []).map(async (product: DatabaseProduct) => {
+          const { data: variants, error: variantsError } = await supabase
+            .from('product_variants')
+            .select('*')
+            .eq('product_id', product.id);
+
+          if (variantsError) {
+            console.error('Failed to fetch variants:', variantsError);
+            return { ...product, variants: [] };
+          }
+
+          return { ...product, variants: variants || [] } as Product;
+        })
+      );
+
+      setProducts(productsWithVariants);
     } catch (error) {
       console.error('Failed to fetch products:', error);
     } finally {
@@ -37,18 +79,16 @@ const ProductGrid = () => {
     }
   };
 
-  const formatProductForCard = (product: Product) => ({
+    const formatProductForCard = (product: Product) => ({
     id: product.id,
     name: product.name,
     price: product.price,
-    discount: product.discount 
-      ? { enabled: true, value: product.discount_percentage || 20 } 
-      : { enabled: false, value: 0 },
-    description: product.description || "High-quality digital product",
+    discount: product.discount, // Change from object to boolean
+    discount_percentage: product.discount_percentage, // Add this prop
     image: product.images && product.images.length > 0 
       ? product.images[0] 
       : "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=300&fit=crop&crop=center",
-    rating: 4.8
+    variants: product.variants || []
   });
 
   if (isLoading) {

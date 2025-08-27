@@ -1,0 +1,384 @@
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Shield, Zap, Download, Heart, Share2, Minus, Plus, ArrowLeft } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+
+interface ProductVariant {
+    id: string;
+    variant_name: string;
+    price_adjustment: number;
+    price: number;
+    discount_percentage?: number | null;
+    is_available: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+interface Product {
+    id: string;
+    name: string;
+    price: number;
+    discount: boolean;
+    discount_percentage?: number;
+    description: string;
+    images: string[];
+    created_at: string;
+    variants?: ProductVariant[];
+}
+
+export default function ProductDetail() {
+    const { id } = useParams();
+    const [product, setProduct] = useState<Product | null>(null);
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [quantity, setQuantity] = useState(1);
+    const [isWishlisted, setIsWishlisted] = useState(false);
+
+    useEffect(() => {
+        fetchProduct();
+    }, [id]);
+
+    const fetchProduct = async () => {
+        try {
+            const { data: productData, error: productError } = await supabase
+                .from('products')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (productError) throw productError;
+
+            // Fetch variants
+            console.log('Fetching variants for product:', id);
+            const { data: variants, error: variantsError } = await supabase
+                .from('product_variants')
+                .select('*')
+                .eq('product_id', id) as { data: ProductVariant[] | null, error: any };
+            
+            console.log('Variants data:', variants);
+
+            if (variantsError) throw variantsError;
+
+            if (productData) {
+                setProduct({
+                    ...productData,
+                    variants: variants || []
+                } as Product);
+            }
+
+            if (variants && variants.length > 0) {
+                setSelectedVariant(variants[0]);
+            }
+        } catch (error) {
+            console.error('Error fetching product:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const calculatePrice = () => {
+        if (!product) return 0;
+
+        let basePrice = selectedVariant ? selectedVariant.price || product.price : product.price;
+        const discountPercentage = selectedVariant?.discount_percentage || product.discount_percentage;
+
+        if (product.discount && discountPercentage) {
+            return basePrice - (basePrice * discountPercentage / 100);
+        }
+
+        return basePrice;
+    };
+
+    const calculateOriginalPrice = () => {
+        if (!product) return 0;
+        return selectedVariant ? selectedVariant.price || product.price : product.price;
+    };
+
+    const handleWhatsAppOrder = () => {
+        if (!product) return;
+
+        const productName = product.name;
+        const variantText = selectedVariant ? `Variant: ${selectedVariant.variant_name}` : '';
+        const quantityText = `Jumlah: ${quantity}`;
+        const totalPrice = `Total Harga: Rp ${(calculatePrice() * quantity).toLocaleString('id-ID')}`;
+        
+        const message = `Halo, saya ingin membeli produk berikut:\n\n*${productName}*\n${variantText ? `${variantText}\n` : ''}${quantityText}\n${totalPrice}\n\nMohon informasi untuk pembayaran. Terima kasih!`;
+        
+        const whatsappUrl = `https://api.whatsapp.com/send/?phone=628992173777&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
+        window.open(whatsappUrl, '_blank');
+    };
+
+    useEffect(() => {
+        console.log('Current product:', product);
+        console.log('Current selected variant:', selectedVariant);
+    }, [product, selectedVariant]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-background">
+                <div className="relative">
+                    <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div className="w-8 h-8 bg-primary rounded-full animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-background">
+                <div className="text-center space-y-4">
+                    <div className="text-6xl opacity-50">🔍</div>
+                    <h2 className="text-2xl font-bold text-foreground">Product Not Found</h2>
+                    <p className="text-muted-foreground">The product you're looking for doesn't exist.</p>
+                    <Button onClick={() => window.history.back()} variant="outline">
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Go Back
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-muted/10 to-background">
+            <Navbar />
+            
+            <main className="flex-1">
+                <div className="container mx-auto px-4 py-8">
+                    {/* Breadcrumb */}
+                    <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-8">
+                        <span>Home</span>
+                        <span>/</span>
+                        <span>Products</span>
+                        <span>/</span>
+                        <span className="text-foreground font-medium">{product.name}</span>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto">
+                        <div className="grid lg:grid-cols-2 gap-16">
+                            {/* Product Images Section */}
+                            <div className="space-y-6">
+                                {/* Main Image */}
+                                <div className="relative group">
+                                    <div className="aspect-square overflow-hidden rounded-3xl bg-gradient-to-br from-muted/20 to-muted/5 p-4">
+                                        <img
+                                            src={product.images[selectedImageIndex]}
+                                            alt={product.name}
+                                            className="w-full h-full object-cover rounded-2xl transition-all duration-500 group-hover:scale-105"
+                                        />
+                                        
+                                        {/* Overlay Badges */}
+                                        <div className="absolute top-6 left-6 space-y-2">
+                                            {product.discount && product.discount_percentage && (
+                                                <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 shadow-lg">
+                                                    {product.discount_percentage}% OFF
+                                                </Badge>
+                                            )}
+                                            <Badge variant="secondary" className="bg-white/90 text-black border-0 shadow-md backdrop-blur-sm">
+                                                Digital Product
+                                            </Badge>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="absolute top-6 right-6 space-y-2">
+                                            <Button 
+                                                size="icon" 
+                                                variant="secondary" 
+                                                className="rounded-full bg-white/90 hover:bg-white shadow-lg backdrop-blur-sm"
+                                                onClick={() => setIsWishlisted(!isWishlisted)}
+                                            >
+                                                <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+                                            </Button>
+                                            <Button 
+                                                size="icon" 
+                                                variant="secondary" 
+                                                className="rounded-full bg-white/90 hover:bg-white shadow-lg backdrop-blur-sm"
+                                                onClick={() => {
+                                                    if (navigator.share) {
+                                                        navigator.share({
+                                                            title: product.name,
+                                                            text: product.description,
+                                                            url: window.location.href
+                                                        });
+                                                    } else {
+                                                        navigator.clipboard.writeText(window.location.href);
+                                                    }
+                                                }}
+                                            >
+                                                <Share2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {/* Thumbnail Gallery */}
+                                <div className="flex space-x-4 overflow-x-auto pb-2">
+                                    {product.images.map((image, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setSelectedImageIndex(index)}
+                                            className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-300 ${
+                                                selectedImageIndex === index 
+                                                    ? 'ring-2 ring-primary ring-offset-2 scale-105' 
+                                                    : 'hover:scale-105 opacity-70 hover:opacity-100'
+                                            }`}
+                                        >
+                                            <img
+                                                src={image}
+                                                alt={`Thumbnail ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Product Info Section */}
+                            <div className="space-y-8">
+                                {/* Header */}
+                                <div className="space-y-4">
+                                    <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent leading-tight">
+                                        {product.name}
+                                    </h1>
+                                    
+                                    <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
+                                        {product.description}
+                                    </p>
+                                </div>
+
+                                {/* Pricing */}
+                                <div className="space-y-2">
+                                    <div className="flex items-baseline space-x-4">
+                                        <span className="text-4xl font-bold text-primary">
+                                            Rp {calculatePrice().toLocaleString('id-ID')}
+                                        </span>
+                                        {product.discount && product.discount_percentage && (
+                                            <span className="text-xl text-muted-foreground line-through">
+                                                Rp {calculateOriginalPrice().toLocaleString('id-ID')}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
+                                </div>
+
+                                {/* Features */}
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="flex items-center space-x-2 p-3 rounded-xl bg-muted/30">
+                                        <Shield className="w-5 h-5 text-primary" />
+                                        <span className="text-sm font-medium">Secure</span>
+                                    </div>
+                                    <div className="flex items-center space-x-2 p-3 rounded-xl bg-muted/30">
+                                        <Zap className="w-5 h-5 text-primary" />
+                                        <span className="text-sm font-medium">Instant</span>
+                                    </div>
+                                    <div className="flex items-center space-x-2 p-3 rounded-xl bg-muted/30">
+                                        <Download className="w-5 h-5 text-primary" />
+                                        <span className="text-sm font-medium">Digital</span>
+                                    </div>
+                                </div>
+
+                                {/* Variant Selection */}
+                                {product.variants && product.variants.length > 0 && (
+                                    <div className="space-y-4 border rounded-xl p-4">
+                                        <label className="text-lg font-semibold">Select Option</label>
+                                        <div className="space-y-2">
+                                            {product.variants.map((variant) => (
+                                                <button
+                                                    key={variant.id}
+                                                    onClick={() => setSelectedVariant(variant)}
+                                                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 flex items-center justify-between ${
+                                                        selectedVariant?.id === variant.id
+                                                            ? 'border-primary bg-primary/5'
+                                                            : 'border-border hover:border-primary/50'
+                                                    }`}
+                                                >
+                                                    <div className="flex flex-col items-start">
+                                                        <span className="font-medium">{variant.variant_name}</span>
+                                                        <span className="text-sm text-muted-foreground">
+                                                            Rp {variant.price.toLocaleString('id-ID')}
+                                                            {variant.discount_percentage && (
+                                                                <span className="ml-2 line-through opacity-70">
+                                                                    Rp {(variant.price * (1 + variant.discount_percentage/100)).toLocaleString('id-ID')}
+                                                                </span>
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                    {variant.discount_percentage && (
+                                                        <Badge variant="secondary" className="ml-2">
+                                                            -{variant.discount_percentage}%
+                                                        </Badge>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Quantity Selector */}
+                                <div className="space-y-3">
+                                    <label className="text-base font-semibold">Quantity</label>
+                                    <div className="flex items-center space-x-4">
+                                        <div className="flex items-center border-2 border-muted rounded-xl overflow-hidden">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-12 w-12 rounded-none hover:bg-muted"
+                                                onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                                                disabled={quantity <= 1}
+                                            >
+                                                <Minus className="w-4 h-4" />
+                                            </Button>
+                                            <div className="w-16 text-center font-semibold">{quantity}</div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-12 w-12 rounded-none hover:bg-muted"
+                                                onClick={() => setQuantity(q => q + 1)}
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">
+                                            Total: <span className="font-semibold text-primary">
+                                                Rp {(calculatePrice() * quantity).toLocaleString('id-ID')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="space-y-4 pt-4">
+                                    <Button 
+                                        className="w-full h-14 text-lg font-semibold rounded-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300"
+                                        size="lg"
+                                        onClick={handleWhatsAppOrder}
+                                    >
+                                        Buy Now
+                                    </Button>
+                                    
+                                    <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground pt-2">
+                                        <Shield className="w-4 h-4" />
+                                        <span>Secure Payment Process</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <Footer />
+        </div>
+    );
+}

@@ -6,11 +6,38 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, Edit, LogIn, LogOut } from "lucide-react";
+import { Trash2, Plus, Edit, LogIn, LogOut, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@supabase/supabase-js";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+interface ProductVariant {
+  price_adjustment: any;
+  id?: string;
+  product_id?: string; 
+  variant_name: string;
+  price: number;
+  discount_percentage?: number;
+  is_available: boolean;
+  [key: string]: any;
+}
+
+type VariantValue = string | number | boolean;
 
 interface Product {
+  discount_percentage: any;
+  discount: any;
+  price: any;
+  id: string;
+  name: string;
+  description: string;
+  images: string[];
+  created_at: string;
+  is_available: boolean;
+  variants?: ProductVariant[];
+}
+
+interface DatabaseProduct {
   id: string;
   name: string;
   price: number;
@@ -25,7 +52,6 @@ const Admin = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [authData, setAuthData] = useState({ email: "", password: "" });
@@ -33,21 +59,24 @@ const Admin = () => {
 
   const [formData, setFormData] = useState({
     name: "",
-    price: "",
-    discount: false,
-    discount_percentage: "",
     description: "",
-    images: [""]
+    images: [""],
+    productType: "digital_product",
+    is_available: true,
+    variants: [{ 
+      variant_name: "", 
+      price: 0,
+      discount_percentage: 0,
+      is_available: true 
+    }] as ProductVariant[]
   });
 
   useEffect(() => {
-    // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setIsLoading(false);
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
@@ -63,13 +92,31 @@ const Admin = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: productsData, error: productsError } = await supabase
         .from('products')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setProducts(data || []);
+      if (productsError) throw productsError;
+
+      // Fetch variants for each product
+      const productsWithVariants = await Promise.all(
+        (productsData || []).map(async (product: DatabaseProduct) => {
+          const { data: variants, error: variantsError } = await supabase
+            .from('product_variants')
+            .select('*')
+            .eq('product_id', product.id);
+
+          if (variantsError) throw variantsError;
+
+          return {
+            ...product,
+            variants: variants || []
+          } as unknown as Product;
+        })
+      );
+
+      setProducts(productsWithVariants);
     } catch (error) {
       toast({
         title: "Error",
@@ -79,8 +126,7 @@ const Admin = () => {
     }
   };
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAuth = async () => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: authData.email,
@@ -117,9 +163,7 @@ const Admin = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!user) {
       toast({
         title: "Error",
@@ -132,12 +176,15 @@ const Admin = () => {
     try {
       const productData = {
         name: formData.name,
-        price: parseFloat(formData.price),
-        discount: formData.discount,
-        discount_percentage: formData.discount ? parseInt(formData.discount_percentage) || 0 : 0,
         description: formData.description,
-        images: formData.images.filter(img => img.trim() !== "")
+        images: formData.images.filter(img => img.trim() !== ""),
+        is_available: formData.is_available,
+        price: formData.variants[0]?.price || 0,
+        discount: formData.variants[0]?.discount_percentage ? true : false,
+        discount_percentage: formData.variants[0]?.discount_percentage || null
       };
+
+      let productId: string;
 
       if (editingProduct) {
         const { error } = await supabase
@@ -146,14 +193,40 @@ const Admin = () => {
           .eq('id', editingProduct.id);
 
         if (error) throw error;
+        productId = editingProduct.id;
+
+        // Delete existing variants
+        await supabase
+          .from('product_variants')
+          .delete()
+          .eq('product_id', productId);
+
         toast({ title: "Success", description: "Product updated successfully" });
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('products')
-          .insert([productData]);
+          .insert([productData])
+          .select()
+          .single();
 
         if (error) throw error;
         toast({ title: "Success", description: "Product added successfully" });
+      }
+
+      // Insert variants
+      const validVariants = formData.variants.filter(v => v.variant_name.trim() !== "");
+      if (validVariants.length > 0) {
+        const variantsData = validVariants.map(variant => ({
+          product_id: productId,
+          variant_name: variant.variant_name,
+          price_adjustment: variant.price_adjustment
+        }));
+
+        const { error: variantsError } = await supabase
+          .from('product_variants')
+          .insert(variantsData);
+
+        if (variantsError) throw variantsError;
       }
 
       resetForm();
@@ -199,11 +272,27 @@ const Admin = () => {
     setEditingProduct(product);
     setFormData({
       name: product.name,
-      price: product.price.toString(),
-      discount: product.discount,
-      discount_percentage: product.discount_percentage?.toString() || "",
       description: product.description || "",
-      images: product.images.length > 0 ? product.images : [""]
+      images: product.images.length > 0 ? product.images : [""],
+      productType: "digital_product",
+      is_available: product.is_available,
+      variants: product.variants && product.variants.length > 0 
+        ? product.variants.map(v => ({ 
+            id: v.id,
+            product_id: v.product_id,
+            variant_name: v.variant_name, 
+            price: v.price,
+            price_adjustment: v.price_adjustment || 0,
+            discount_percentage: v.discount_percentage || 0,
+            is_available: v.is_available
+          }))
+        : [{ 
+            variant_name: "", 
+            price: 0, 
+            price_adjustment: 0,
+            discount_percentage: 0,
+            is_available: true 
+          }]
     });
     setShowForm(true);
   };
@@ -211,11 +300,17 @@ const Admin = () => {
   const resetForm = () => {
     setFormData({
       name: "",
-      price: "",
-      discount: false,
-      discount_percentage: "",
       description: "",
-      images: [""]
+      images: [""],
+      productType: "digital_product",
+      is_available: true,
+      variants: [{
+        variant_name: "",
+        price: 0,
+        discount_percentage: 0,
+        is_available: true,
+        price_adjustment: undefined
+      }]
     });
     setEditingProduct(null);
     setShowForm(false);
@@ -242,6 +337,35 @@ const Admin = () => {
     }));
   };
 
+  const addVariant = () => {
+    setFormData(prev => ({
+      ...prev,
+      variants: [...prev.variants, { 
+        variant_name: "", 
+        price: 0,
+        discount_percentage: 0,
+        is_available: true,
+        price_adjustment: 0
+      }]
+    }));
+  };
+
+  const updateVariant = (index: number, field: keyof ProductVariant, value: VariantValue) => {
+    setFormData(prev => ({
+      ...prev,
+      variants: prev.variants.map((variant, i) => 
+        i === index ? { ...variant, [field]: value } : variant
+      )
+    }));
+  };
+
+  const removeVariant = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      variants: prev.variants.filter((_, i) => i !== index)
+    }));
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -250,16 +374,15 @@ const Admin = () => {
     );
   }
 
-  // Show login form if not authenticated
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>{isSignUp ? "Create Admin Account" : "Admin Login"}</CardTitle>
+            <CardTitle>Admin Login</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAuth} className="space-y-4">
+            <div className="space-y-4">
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -278,21 +401,13 @@ const Admin = () => {
                   value={authData.password}
                   onChange={(e) => setAuthData(prev => ({ ...prev, password: e.target.value }))}
                   required
-                  minLength={6}
                 />
-                {isSignUp && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Password must be at least 6 characters
-                  </p>
-                )}
               </div>
-              <Button type="submit" className="w-full">
+              <Button onClick={handleAuth} className="w-full">
                 <LogIn className="w-4 h-4 mr-2" />
-                {isSignUp ? "Sign Up" : "Login"}
+                Login
               </Button>
-              <div className="text-center">
-              </div>
-            </form>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -328,7 +443,7 @@ const Admin = () => {
               <CardTitle>{editingProduct ? "Edit Product" : "Add New Product"}</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-6">
                 <div>
                   <Label htmlFor="name">Product Name</Label>
                   <Input
@@ -339,50 +454,171 @@ const Admin = () => {
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="price">Price</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="discount"
-                    checked={formData.discount}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, discount: checked }))}
-                  />
-                  <Label htmlFor="discount">Has Discount</Label>
-                </div>
-
-                {formData.discount && (
-                  <div>
-                    <Label htmlFor="discount_percentage">Discount Percentage (%)</Label>
-                    <Input
-                      id="discount_percentage"
-                      type="number"
-                      min="1"
-                      max="99"
-                      value={formData.discount_percentage}
-                      onChange={(e) => setFormData(prev => ({ ...prev, discount_percentage: e.target.value }))}
-                      placeholder="e.g. 20"
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <Label htmlFor="description">Description</Label>
+                <div className="space-y-4">
+                  <Label>Product Description</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
                   />
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="productType">Product Type</Label>
+                    <Select
+                      value={formData.productType || "digital_product"}
+                      onValueChange={(value) => {
+                        setFormData(prev => ({ 
+                          ...prev, 
+                          productType: value,
+                          variants: value === "digital_service" ? 
+                            [{ 
+                              variant_name: "Digital Service", 
+                              price_adjustment: 0,
+                              price: 0,
+                              is_available: true,
+                              discount_percentage: 0
+                            }] :
+                            [{ 
+                              variant_name: "", 
+                              price_adjustment: 0,
+                              price: 0,
+                              is_available: true,
+                              discount_percentage: 0
+                            }]
+                        }));
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select product type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="premium_app">Premium App</SelectItem>
+                        <SelectItem value="digital_service">Digital Service</SelectItem>
+                        <SelectItem value="digital_product">Digital Product</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      rows={3}
+                    />
+                  </div>
+                </div>
+
+                {/* Product Variants */}
+                <div className="space-y-4">
+                  <Label>Product Variants</Label>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {formData.productType === "digital_service" 
+                      ? "Configure service options and platforms"
+                      : "Add different options for this product"}
+                  </p>
+                  {formData.variants.map((variant, index) => (
+                    <div key={index} className="space-y-3 border rounded-lg p-4 bg-muted/10">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">Variant {index + 1}</h4>
+                        {formData.variants.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeVariant(index)}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="space-y-3">
+                          <div>
+                            <Label>Discord Package</Label>
+                            <Select
+                              value={variant.variant_name}
+                              onValueChange={(value) => {
+                                updateVariant(index, 'variant_name', value);
+                                // Set default price based on package
+                                let defaultPrice = 0;
+                                switch(value) {
+                                  case "Discord Nitro Basic":
+                                    defaultPrice = 50000;
+                                    break;
+                                  case "Discord Nitro Classic":
+                                    defaultPrice = 75000;
+                                    break;
+                                  case "Discord Nitro":
+                                    defaultPrice = 100000;
+                                    break;
+                                  case "Discord Server Boost":
+                                    defaultPrice = 85000;
+                                    break;
+                                }
+                                updateVariant(index, 'price', defaultPrice);
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Discord package" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Discord Nitro Basic">Discord Nitro Basic</SelectItem>
+                                <SelectItem value="Discord Nitro Classic">Discord Nitro Classic</SelectItem>
+                                <SelectItem value="Discord Nitro">Discord Nitro</SelectItem>
+                                <SelectItem value="Discord Server Boost">Discord Server Boost</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div>
+                            <Label>Package Price</Label>
+                            <Input
+                              type="number"
+                              placeholder="Enter price"
+                              value={variant.price}
+                              onChange={(e) => updateVariant(index, 'price', parseFloat(e.target.value) || 0)}
+                            />
+                          </div>
+
+                          <div>
+                            <Label>Discount Percentage (%)</Label>
+                            <Input
+                              type="number"
+                              placeholder="Enter discount"
+                              min="0"
+                              max="100"
+                              value={variant.discount_percentage || 0}
+                              onChange={(e) => updateVariant(index, 'discount_percentage', parseFloat(e.target.value) || 0)}
+                            />
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              checked={variant.is_available}
+                              onCheckedChange={(checked) => updateVariant(index, 'is_available', checked)}
+                            />
+                            <Label>Available</Label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addVariant}
+                    className="mt-2 w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add {formData.productType === "digital_service" ? "Service Option" : "Variant"}
+                  </Button>
                 </div>
 
                 <div>
@@ -419,14 +655,14 @@ const Admin = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <Button type="submit">
+                  <Button onClick={handleSubmit}>
                     {editingProduct ? "Update Product" : "Add Product"}
                   </Button>
-                  <Button type="button" variant="outline" onClick={resetForm}>
+                  <Button variant="outline" onClick={resetForm}>
                     Cancel
                   </Button>
                 </div>
-              </form>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -450,6 +686,22 @@ const Admin = () => {
                       <span className="text-sm text-green-600">
                         Discount: {product.discount_percentage}%
                       </span>
+                    )}
+                    {product.variants && product.variants.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-xs text-muted-foreground">Variants:</p>
+                        {product.variants.map((variant, i) => (
+                          <div key={i} className="text-xs text-muted-foreground">
+                            • {variant.variant_name} 
+                            {variant.price_adjustment !== 0 && (
+                              <span className="text-primary">
+                                {variant.price_adjustment > 0 ? '+' : ''}
+                                {variant.price_adjustment.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )}
                     {product.description && (
                       <p className="text-sm text-muted-foreground mt-2">{product.description}</p>
