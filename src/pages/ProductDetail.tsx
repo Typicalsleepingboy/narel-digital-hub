@@ -297,14 +297,26 @@ export default function ProductDetail() {
                                                 <button
                                                     key={variant.id}
                                                     onClick={() => setSelectedVariant(variant)}
+                                                    disabled={!variant.is_available}
                                                     className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 flex items-center justify-between ${
                                                         selectedVariant?.id === variant.id
                                                             ? 'border-primary bg-primary/5'
-                                                            : 'border-border hover:border-primary/50'
+                                                            : variant.is_available 
+                                                                ? 'border-border hover:border-primary/50 cursor-pointer'
+                                                                : 'border-border/30 bg-muted/30 cursor-not-allowed opacity-60'
                                                     }`}
                                                 >
                                                     <div className="flex flex-col items-start">
-                                                        <span className="font-medium">{variant.variant_name}</span>
+                                                        <div className="flex items-center space-x-2">
+                                                            <span className={`font-medium ${!variant.is_available ? 'text-muted-foreground' : ''}`}>
+                                                                {variant.variant_name}
+                                                            </span>
+                                                            {!variant.is_available && (
+                                                                <Badge variant="secondary" className="text-xs bg-red-100 text-red-700 border-red-200">
+                                                                    Not Available
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                         <span className="text-sm text-muted-foreground">
                                                             Rp {variant.price.toLocaleString('id-ID')}
                                                             {variant.discount_percentage && (
@@ -314,7 +326,7 @@ export default function ProductDetail() {
                                                             )}
                                                         </span>
                                                     </div>
-                                                    {variant.discount_percentage && (
+                                                    {variant.discount_percentage && variant.is_available && (
                                                         <Badge variant="secondary" className="ml-2">
                                                             -{variant.discount_percentage}%
                                                         </Badge>
@@ -360,11 +372,16 @@ export default function ProductDetail() {
                                 {/* Action Buttons */}
                                 <div className="space-y-4 pt-4">
                                     <Button 
-                                        className="w-full h-14 text-lg font-semibold rounded-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300"
+                                        className={`w-full h-14 text-lg font-semibold rounded-xl shadow-xl transition-all duration-300 ${
+                                            selectedVariant && !selectedVariant.is_available
+                                                ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                                                : 'bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary hover:shadow-2xl transform hover:scale-[1.02]'
+                                        }`}
                                         size="lg"
                                         onClick={handleWhatsAppOrder}
+                                        disabled={selectedVariant && !selectedVariant.is_available}
                                     >
-                                        Buy Now
+                                        {selectedVariant && !selectedVariant.is_available ? 'Not Available' : 'Buy Now'}
                                     </Button>
                                     
                                     <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground pt-2">
