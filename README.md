@@ -111,6 +111,80 @@ npm run build
 npm run preview
 ```
 
+### Deploying to Vercel
+
+This project is configured for seamless deployment on Vercel with proper SPA routing support.
+
+#### Automatic Configuration
+The following files are already configured for Vercel deployment:
+- `vercel.json` - Handles SPA routing for all routes
+- `public/_redirects` - Alternative configuration for Netlify
+- Environment variables configured in `.env`
+
+#### Deployment Steps
+1. **Connect Repository**: Link your GitHub repository to Vercel
+2. **Set Environment Variables**: Add your environment variables in Vercel dashboard:
+   ```
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+3. **Deploy**: Vercel will automatically build and deploy your app
+4. **Custom Domain** (optional): Configure your custom domain in Vercel settings
+
+#### SPA Routing Fix
+The `vercel.json` file ensures that all routes (including `/narel`, `/product/:id`) are properly handled by serving `index.html` and letting React Router manage client-side routing.
+
+### Deploying to Other Platforms
+
+#### Netlify
+- The `public/_redirects` file handles SPA routing
+- Set environment variables in Netlify dashboard
+- Connect your repository and deploy
+
+#### Other Platforms
+- Ensure your hosting platform supports SPA routing
+- Configure rewrites to serve `index.html` for all routes
+- Set environment variables according to platform documentation
+
+## 🔧 Troubleshooting
+
+### 404 Errors on Direct Route Access
+If you're getting 404 errors when accessing routes like `/narel` directly:
+
+1. **Check Vercel Configuration**: Ensure `vercel.json` is in your project root
+2. **Redeploy**: Trigger a new deployment after adding `vercel.json`
+3. **Clear Cache**: Hard refresh your browser (Ctrl+F5 or Cmd+Shift+R)
+
+### Environment Variable Issues
+If the app fails to load with environment errors:
+
+1. **Check Vercel Dashboard**: Verify all required environment variables are set
+2. **Variable Names**: Ensure variables match exactly (case-sensitive)
+3. **Redeploy**: Environment changes require a new deployment
+
+### Build Errors
+If the build fails:
+
+1. **Check Dependencies**: Run `npm install` locally first
+2. **Environment Variables**: Ensure all required vars are set in Vercel
+3. **Build Logs**: Check Vercel deployment logs for specific errors
+
+### Common Issues
+
+#### Issue: "Missing VITE_SUPABASE_URL environment variable"
+**Solution**: Add `VITE_SUPABASE_URL` in your Vercel environment variables
+
+#### Issue: Routes return 404
+**Solution**: Ensure `vercel.json` is present and redeploy
+
+#### Issue: App shows blank page
+**Solution**: Check browser console for JavaScript errors, verify environment variables
+
+### Getting Help
+- Check Vercel deployment logs for detailed error messages
+- Verify environment variables in Vercel dashboard
+- Test locally with `npm run build && npm run preview`
+
 ## 🤝 Contributing
 
 1. Fork the repository
