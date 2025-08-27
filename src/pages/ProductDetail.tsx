@@ -54,14 +54,10 @@ export default function ProductDetail() {
 
             if (productError) throw productError;
 
-            // Fetch variants
-            console.log('Fetching variants for product:', id);
             const { data: variants, error: variantsError } = await supabase
                 .from('product_variants')
                 .select('*')
                 .eq('product_id', id) as { data: ProductVariant[] | null, error: any };
-            
-            console.log('Variants data:', variants);
 
             if (variantsError) throw variantsError;
 
@@ -195,8 +191,6 @@ export default function ProductDetail() {
     };
 
     useEffect(() => {
-        console.log('Current product:', product);
-        console.log('Current selected variant:', selectedVariant);
     }, [product, selectedVariant]);
 
     if (loading) {
