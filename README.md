@@ -197,13 +197,6 @@ If the build fails:
 
 This project is private and proprietary to NareL Digital.
 
-## 📞 Support
-
-- **WhatsApp**: +62 899-217-3777
-- **Discord**: [Join our community](https://discord.gg/narelid)
-- **Instagram**: [@narel.idn](https://www.instagram.com/narel.idn)
-- **Email**: support@narel.id
-
 ## 🙏 Acknowledgments
 
 - **sleeping.stu**: Development partnership and technical support
