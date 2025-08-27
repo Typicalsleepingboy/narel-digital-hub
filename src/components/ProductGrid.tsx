@@ -147,12 +147,6 @@ const ProductGrid = () => {
                 <ProductCard key={product.id} {...formatProductForCard(product)} />
               ))}
             </div>
-            
-            <div className="text-center mt-12">
-              <button className="text-primary hover:text-accent font-medium transition-colors">
-                View All Products →
-              </button>
-            </div>
           </>
         ) : (
           <div className="text-center py-16">

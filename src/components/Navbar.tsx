@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from 'react-router-dom'
 
 const Navbar = () => {
   return (
@@ -9,7 +10,7 @@ const Navbar = () => {
             NareL <span className="text-accent">Digital</span>
           </div>
         </div>
-        
+
         <div className="hidden md:flex items-center space-x-8">
           <a href="#home" className="text-foreground hover:text-primary transition-colors">
             Home
@@ -21,11 +22,15 @@ const Navbar = () => {
             Terms
           </a>
         </div>
-        
+
         <div className="flex items-center space-x-3">
-          <Button variant="accent" size="sm">
-            Go to Discord
-          </Button>
+          <Button
+            type="button" variant="accent" size="sm"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = 'https://discord.gg/narelid';
+            }}
+          > Go To Discord</Button>
         </div>
       </div>
     </nav>
