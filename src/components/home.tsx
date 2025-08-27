@@ -1,7 +1,37 @@
-import {  Star } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Star } from "lucide-react";
 import heroImage from "@/assets/narel.png";
 
+const useCountUp = (end, duration = 2000) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const increment = end / (duration / 16); 
+    let frame;
+
+    const updateCount = () => {
+      start += increment;
+      if (start < end) {
+        setCount(Math.floor(start));
+        frame = requestAnimationFrame(updateCount);
+      } else {
+        setCount(end);
+      }
+    };
+
+    frame = requestAnimationFrame(updateCount);
+    return () => cancelAnimationFrame(frame);
+  }, [end, duration]);
+
+  return count;
+};
+
 const Hero = () => {
+  const products = useCountUp(1000);
+  const customers = useCountUp(50000);
+  const rating = useCountUp(49, 2000); 
+
   return (
     <section id="home" className="pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-6xl">
@@ -35,15 +65,15 @@ const Hero = () => {
             {/* Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-16">
               <div className="text-center">
-                <div className="text-4xl lg:text-5xl font-bold text-primary mb-2">1000+</div>
+                <div className="text-4xl lg:text-5xl font-bold text-primary mb-2">{products}+ </div>
                 <div className="text-lg text-muted-foreground">Digital Products</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl lg:text-5xl font-bold text-primary mb-2">50K+</div>
+                <div className="text-4xl lg:text-5xl font-bold text-primary mb-2">{customers.toLocaleString()}+ </div>
                 <div className="text-lg text-muted-foreground">Happy Customers</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl lg:text-5xl font-bold text-primary mb-2">4.9★</div>
+                <div className="text-4xl lg:text-5xl font-bold text-primary mb-2">{(rating/10).toFixed(1)}★</div>
                 <div className="text-lg text-muted-foreground">User Rating</div>
               </div>
             </div>

@@ -84,6 +84,53 @@ export default function ProductDetail() {
         }
     };
 
+    const formatDescription = (description: string) => {
+        return description
+            .split('\n')
+            .map((line, index) => {
+                // Handle bullet points with »
+                if (line.trim().startsWith('»')) {
+                    return (
+                        <div key={index} className="flex items-start space-x-2 ml-2">
+                            <span className="text-primary font-bold mt-0.5">»</span>
+                            <span>{line.trim().substring(1).trim()}</span>
+                        </div>
+                    );
+                }
+                
+                // Handle bullet points with •
+                if (line.trim().startsWith('•')) {
+                    return (
+                        <div key={index} className="flex items-start space-x-2 ml-2">
+                            <span className="text-primary font-bold mt-0.5">•</span>
+                            <span>{line.trim().substring(1).trim()}</span>
+                        </div>
+                    );
+                }
+                
+                // Handle section headers (lines ending with :)
+                if (line.trim().endsWith(':') && line.trim().length > 1) {
+                    return (
+                        <div key={index} className="font-semibold text-foreground mt-4 mb-2 first:mt-0">
+                            {line.trim()}
+                        </div>
+                    );
+                }
+                
+                // Handle empty lines
+                if (line.trim() === '') {
+                    return <div key={index} className="h-2"></div>;
+                }
+                
+                // Regular text
+                return (
+                    <div key={index} className="mb-1">
+                        {line}
+                    </div>
+                );
+            });
+    };
+
     const calculatePrice = () => {
         if (!product) return 0;
 
@@ -185,9 +232,6 @@ export default function ProductDetail() {
                                                     {product.discount_percentage}% OFF
                                                 </Badge>
                                             )}
-                                            <Badge variant="secondary" className="bg-white/90 text-black border-0 shadow-md backdrop-blur-sm">
-                                                Digital Product
-                                            </Badge>
                                         </div>
 
                                         {/* Action Buttons */}
@@ -252,9 +296,10 @@ export default function ProductDetail() {
                                         {product.name}
                                     </h1>
                                     
-                                    <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
-                                        {product.description}
-                                    </p>
+                                    {/* Formatted Description */}
+                                    <div className="text-base text-muted-foreground leading-relaxed max-w-2xl bg-muted/20 rounded-xl p-4">
+                                        {formatDescription(product.description)}
+                                    </div>
                                 </div>
 
                                 {/* Pricing */}

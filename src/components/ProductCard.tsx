@@ -19,8 +19,8 @@ interface ProductCardProps {
   id: string;
   name: string;
   price: number;
-  discount?: boolean; // Changed from object to boolean
-  discount_percentage?: number; // Added this prop
+  discount?: boolean; 
+  discount_percentage?: number; 
   image: string;
   variants?: ProductVariant[];
 }
@@ -42,7 +42,7 @@ const ProductCard = ({
 
   const calculatePrice = () => {
     let basePrice = selectedVariant ? selectedVariant.price || price : price;
-    if (discount && discount_percentage) { // Use discount_percentage directly
+    if (discount && discount_percentage) {
       return basePrice - (basePrice * discount_percentage / 100);
     }
     return basePrice;

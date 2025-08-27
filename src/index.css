@@ -18,7 +18,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 220 13% 18%;
 
-    --primary: 217 91% 15%; /* Deep professional blue */
+    --primary: 0 93% 47%; /* Bright red #ef0606 */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 220 14% 96%; /* Light gray */
@@ -27,7 +27,7 @@ All colors MUST be HSL.
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
 
-    --accent: 217 91% 60%; /* Bright blue accent */
+    --accent: 0 93% 60%; /* Lighter red accent */
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84% 60%;
@@ -35,7 +35,7 @@ All colors MUST be HSL.
 
     --border: 220 13% 91%;
     --input: 0 0% 100%;
-    --ring: 217 91% 60%;
+    --ring: 0 93% 60%;
 
     --radius: 0.5rem;
 
@@ -53,7 +53,7 @@ All colors MUST be HSL.
 
     --sidebar-border: 220 13% 91%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 0 93% 60%;
   }
 
   .dark {
@@ -66,8 +66,8 @@ All colors MUST be HSL.
     --popover: 220 13% 10%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 220 13% 8%;
+    --primary: 0 93% 55%; /* Slightly lighter red for dark mode */
+    --primary-foreground: 0 0% 98%;
 
     --secondary: 220 13% 15%;
     --secondary-foreground: 0 0% 95%;
@@ -75,23 +75,23 @@ All colors MUST be HSL.
     --muted: 220 13% 15%;
     --muted-foreground: 220 9% 65%;
 
-    --accent: 217 91% 70%;
-    --accent-foreground: 220 13% 8%;
+    --accent: 0 93% 65%; /* Lighter red accent for dark mode */
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 95%;
 
     --border: 220 13% 20%;
     --input: 220 13% 15%;
-    --ring: 217 91% 60%;
+    --ring: 0 93% 60%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary: 0 93% 55%; /* Red sidebar primary for dark mode */
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 0 93% 60%;
     
     /* Custom Design Tokens */
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));

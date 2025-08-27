@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 interface ProductVariant {
   price_adjustment: any;
   id?: string;
-  product_id?: string;
+  product_id?: string; 
   variant_name: string;
   price: number;
   discount_percentage?: number;
@@ -25,6 +25,7 @@ interface ProductVariant {
 type VariantValue = string | number | boolean;
 
 interface Product {
+  product_type: string;
   discount_percentage: any;
   discount: any;
   price: any;
@@ -46,6 +47,7 @@ interface DatabaseProduct {
   description: string;
   images: string[];
   created_at: string;
+  product_type: string;
 }
 
 const Admin = () => {
@@ -63,11 +65,11 @@ const Admin = () => {
     images: [""],
     productType: "digital_product",
     is_available: true,
-    variants: [{
-      variant_name: "",
+    variants: [{ 
+      variant_name: "", 
       price: 0,
       discount_percentage: 0,
-      is_available: true
+      is_available: true 
     }] as ProductVariant[]
   });
 
@@ -134,7 +136,7 @@ const Admin = () => {
       });
 
       if (error) throw error;
-
+      
       toast({ title: "Success", description: "Logged in successfully" });
       setAuthData({ email: "", password: "" });
     } catch (error: any) {
@@ -150,7 +152,7 @@ const Admin = () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-
+      
       toast({ title: "Success", description: "Logged out successfully" });
       setProducts([]);
       resetForm();
@@ -172,7 +174,7 @@ const Admin = () => {
       });
       return;
     }
-
+    
     try {
       const productData = {
         name: formData.name,
@@ -181,7 +183,8 @@ const Admin = () => {
         is_available: formData.is_available,
         price: formData.variants[0]?.price || 0,
         discount: formData.variants[0]?.discount_percentage ? true : false,
-        discount_percentage: formData.variants[0]?.discount_percentage || null
+        discount_percentage: formData.variants[0]?.discount_percentage || null,
+        product_type: formData.productType
       };
 
       let productId: string;
@@ -195,7 +198,6 @@ const Admin = () => {
         if (error) throw error;
         productId = editingProduct.id;
 
-        // Delete existing variants
         await supabase
           .from('product_variants')
           .delete()
@@ -210,6 +212,7 @@ const Admin = () => {
           .single();
 
         if (error) throw error;
+       productId = data.id;
         toast({ title: "Success", description: "Product added successfully" });
       }
 
@@ -219,10 +222,10 @@ const Admin = () => {
         const variantsData = validVariants.map(variant => ({
           product_id: productId,
           variant_name: variant.variant_name,
-          price: variant.price,
-          price_adjustment: variant.price_adjustment || 0,
-          discount_percentage: variant.discount_percentage || null,
-          is_available: variant.is_available
+         price: variant.price,
+         price_adjustment: variant.price_adjustment || 0,
+         discount_percentage: variant.discount_percentage || null,
+         is_available: variant.is_available
         }));
 
         const { error: variantsError } = await supabase
@@ -271,34 +274,34 @@ const Admin = () => {
     }
   };
 
-  const editProduct = (product: Product) => {
+    const editProduct = (product: Product) => {
     setEditingProduct(product);
     setFormData({
       name: product.name,
       description: product.description || "",
       images: product.images.length > 0 ? product.images : [""],
-      productType: "digital_product",
+      productType: product.product_type || "digital_product",
       is_available: product.is_available,
-      variants: product.variants && product.variants.length > 0
-        ? product.variants.map(v => ({
-          id: v.id,
-          product_id: v.product_id,
-          variant_name: v.variant_name,
-          price: v.price,
-          price_adjustment: v.price_adjustment || 0,
-          discount_percentage: v.discount_percentage || 0,
-          is_available: v.is_available
-        }))
-        : [{
-          variant_name: "",
-          price: 0,
-          price_adjustment: 0,
-          discount_percentage: 0,
-          is_available: true
-        }]
+      variants: product.variants && product.variants.length > 0 
+        ? product.variants.map(v => ({ 
+            id: v.id,
+            product_id: v.product_id,
+            variant_name: v.variant_name, 
+            price: v.price,
+            price_adjustment: v.price_adjustment || 0,
+            discount_percentage: v.discount_percentage || 0,
+            is_available: v.is_available
+          }))
+        : [{ 
+            variant_name: "", 
+            price: 0, 
+            price_adjustment: 0,
+            discount_percentage: 0,
+            is_available: true 
+          }]
     });
     setShowForm(true);
-  };
+  }
 
   const resetForm = () => {
     setFormData({
@@ -343,8 +346,8 @@ const Admin = () => {
   const addVariant = () => {
     setFormData(prev => ({
       ...prev,
-      variants: [...prev.variants, {
-        variant_name: "",
+      variants: [...prev.variants, { 
+        variant_name: "", 
         price: 0,
         discount_percentage: 0,
         is_available: true,
@@ -356,7 +359,7 @@ const Admin = () => {
   const updateVariant = (index: number, field: keyof ProductVariant, value: VariantValue) => {
     setFormData(prev => ({
       ...prev,
-      variants: prev.variants.map((variant, i) =>
+      variants: prev.variants.map((variant, i) => 
         i === index ? { ...variant, [field]: value } : variant
       )
     }));
@@ -473,19 +476,19 @@ const Admin = () => {
                     <Select
                       value={formData.productType || "digital_product"}
                       onValueChange={(value) => {
-                        setFormData(prev => ({
-                          ...prev,
+                        setFormData(prev => ({ 
+                          ...prev, 
                           productType: value,
-                          variants: value === "digital_service" ?
-                            [{
-                              variant_name: "Digital Service",
+                          variants: value === "digital_service" ? 
+                            [{ 
+                              variant_name: "Digital Service", 
                               price_adjustment: 0,
                               price: 0,
                               is_available: true,
                               discount_percentage: 0
                             }] :
-                            [{
-                              variant_name: "",
+                            [{ 
+                              variant_name: "", 
                               price_adjustment: 0,
                               price: 0,
                               is_available: true,
@@ -520,7 +523,7 @@ const Admin = () => {
                 <div className="space-y-4">
                   <Label>Product Variants</Label>
                   <p className="text-sm text-muted-foreground mb-3">
-                    {formData.productType === "digital_service"
+                    {formData.productType === "digital_service" 
                       ? "Configure service options and platforms"
                       : "Add different options for this product"}
                   </p>
@@ -585,7 +588,7 @@ const Admin = () => {
                       </div>
                     </div>
                   ))}
-
+                  
                   <Button
                     type="button"
                     variant="outline"
@@ -668,7 +671,7 @@ const Admin = () => {
                         <p className="text-xs text-muted-foreground">Variants:</p>
                         {product.variants.map((variant, i) => (
                           <div key={i} className="text-xs text-muted-foreground">
-                            • {variant.variant_name}
+                            • {variant.variant_name} 
                             {variant.price_adjustment !== 0 && (
                               <span className="text-primary">
                                 {variant.price_adjustment > 0 ? '+' : ''}

@@ -83,8 +83,8 @@ const ProductGrid = () => {
     id: product.id,
     name: product.name,
     price: product.price,
-    discount: product.discount, // Change from object to boolean
-    discount_percentage: product.discount_percentage, // Add this prop
+    discount: product.discount, 
+    discount_percentage: product.discount_percentage, 
     image: product.images && product.images.length > 0 
       ? product.images[0] 
       : "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=300&fit=crop&crop=center",

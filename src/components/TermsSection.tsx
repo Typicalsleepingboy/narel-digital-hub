@@ -61,7 +61,7 @@ const TermsSection = () => {
   ];
 
   return (
-    <section id="terms" className="py-16 px-4 bg-secondary/50">
+    <section id="terms" className="py-16 px-4 ">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center space-y-4 mb-12">
           <h2 className="text-4xl font-display font-bold text-foreground">
