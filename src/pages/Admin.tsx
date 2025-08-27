@@ -210,6 +210,7 @@ const Admin = () => {
           .single();
 
         if (error) throw error;
+       productId = data.id;
         toast({ title: "Success", description: "Product added successfully" });
       }
 
@@ -219,7 +220,10 @@ const Admin = () => {
         const variantsData = validVariants.map(variant => ({
           product_id: productId,
           variant_name: variant.variant_name,
-          price_adjustment: variant.price_adjustment
+         price: variant.price,
+         price_adjustment: variant.price_adjustment || 0,
+         discount_percentage: variant.discount_percentage || null,
+         is_available: variant.is_available
         }));
 
         const { error: variantsError } = await supabase
@@ -540,44 +544,17 @@ const Admin = () => {
                       <div className="space-y-3">
                         <div className="space-y-3">
                           <div>
-                            <Label>Discord Package</Label>
-                            <Select
+                            <Label>Variant Name</Label>
+                            <Input
+                              type="text"
+                              placeholder="Enter variant name (e.g., Discord Nitro Basic, Netflix Premium, etc.)"
                               value={variant.variant_name}
-                              onValueChange={(value) => {
-                                updateVariant(index, 'variant_name', value);
-                                // Set default price based on package
-                                let defaultPrice = 0;
-                                switch(value) {
-                                  case "Discord Nitro Basic":
-                                    defaultPrice = 50000;
-                                    break;
-                                  case "Discord Nitro Classic":
-                                    defaultPrice = 75000;
-                                    break;
-                                  case "Discord Nitro":
-                                    defaultPrice = 100000;
-                                    break;
-                                  case "Discord Server Boost":
-                                    defaultPrice = 85000;
-                                    break;
-                                }
-                                updateVariant(index, 'price', defaultPrice);
-                              }}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Discord package" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Discord Nitro Basic">Discord Nitro Basic</SelectItem>
-                                <SelectItem value="Discord Nitro Classic">Discord Nitro Classic</SelectItem>
-                                <SelectItem value="Discord Nitro">Discord Nitro</SelectItem>
-                                <SelectItem value="Discord Server Boost">Discord Server Boost</SelectItem>
-                              </SelectContent>
-                            </Select>
+                              onChange={(e) => updateVariant(index, 'variant_name', e.target.value)}
+                            />
                           </div>
 
                           <div>
-                            <Label>Package Price</Label>
+                            <Label>Variant Price</Label>
                             <Input
                               type="number"
                               placeholder="Enter price"
@@ -617,7 +594,7 @@ const Admin = () => {
                     className="mt-2 w-full"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Add {formData.productType === "digital_service" ? "Service Option" : "Variant"}
+                    Add Variant
                   </Button>
                 </div>
 
