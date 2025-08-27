@@ -4,6 +4,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
+import Autoplay from "embla-carousel-autoplay";
 
 const PaymentMethods = () => {
   const paymentMethods = [
@@ -69,6 +70,13 @@ const PaymentMethods = () => {
               skipSnaps: false,
               dragFree: true,
             }}
+            plugins={[
+              Autoplay({
+                delay: 2000,
+                stopOnInteraction: true,
+                stopOnMouseEnter: true,
+              }),
+            ]}
             className="w-full"
           >
             <CarouselContent className="-ml-2 md:-ml-4">
@@ -98,13 +106,14 @@ const PaymentMethods = () => {
         <div className="text-center mt-12">
           <div className="inline-flex items-center space-x-2 bg-red-50 rounded-full py-2 px-4 border border-red-100">
             <div className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white " viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             </div>
-            <p className="text-sm text-red-700">
-              Pembayaran aman dan terpercaya • Proses otomatis 24/7
-            </p>
+            <p className="text-xs sm:text-sm text-red-700">
+            Pembayaran aman dan terpercaya • Proses otomatis 24/7
+          </p>
+
           </div>
         </div>
       </div>

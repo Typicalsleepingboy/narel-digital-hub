@@ -95,31 +95,31 @@ const ProductGrid = () => {
 
   if (isLoading) {
     return (
-      <section id="products" className="py-8 sm:py-12 md:py-16 px-4">
+      <section id="products" className="py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center space-y-2 sm:space-y-4 mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
               Featured Digital Products
             </h2>
-            <p className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Discover our curated collection of high-quality digital products and services designed to boost your business.
             </p>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
+
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8">
             {/* Loading skeleton */}
             {[...Array(6)].map((_, index) => (
-              <div key={index} className="bg-card rounded-xl sm:rounded-2xl shadow-card overflow-hidden animate-pulse">
-                <div className="w-full h-32 sm:h-40 md:h-48 bg-muted"></div>
-                <div className="p-3 sm:p-4 md:p-6 space-y-2 sm:space-y-4">
-                  <div className="space-y-1 sm:space-y-2">
-                    <div className="h-4 sm:h-6 bg-muted rounded w-3/4"></div>
-                    <div className="h-3 sm:h-4 bg-muted rounded w-full"></div>
-                    <div className="h-3 sm:h-4 bg-muted rounded w-2/3"></div>
+              <div key={index} className="bg-card rounded-lg sm:rounded-xl md:rounded-2xl shadow-card overflow-hidden animate-pulse">
+                <div className="w-full h-28 sm:h-36 md:h-40 lg:h-48 bg-muted"></div>
+                <div className="p-2 sm:p-3 md:p-4 lg:p-6 space-y-1.5 sm:space-y-2 md:space-y-3 lg:space-y-4">
+                  <div className="space-y-1 sm:space-y-1.5 md:space-y-2">
+                    <div className="h-3 sm:h-4 md:h-5 lg:h-6 bg-muted rounded w-3/4"></div>
+                    <div className="h-2.5 sm:h-3 md:h-4 bg-muted rounded w-full"></div>
+                    <div className="h-2.5 sm:h-3 md:h-4 bg-muted rounded w-2/3"></div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="h-6 sm:h-8 bg-muted rounded w-1/3"></div>
-                    <div className="h-6 sm:h-8 bg-muted rounded w-1/4"></div>
+                    <div className="h-4 sm:h-5 md:h-6 lg:h-8 bg-muted rounded w-1/3"></div>
+                    <div className="h-4 sm:h-5 md:h-6 lg:h-8 bg-muted rounded w-1/4"></div>
                   </div>
                 </div>
               </div>
@@ -131,30 +131,30 @@ const ProductGrid = () => {
   }
 
   return (
-    <section id="products" className="py-8 sm:py-12 md:py-16 px-4">
+    <section id="products" className="py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4">
       <div className="container mx-auto max-w-6xl">
-        <div className="text-center space-y-2 sm:space-y-4 mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
             Featured Digital Products
           </h2>
-          <p className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Discover our curated collection of high-quality digital products and services designed to boost your business.
           </p>
         </div>
-        
+
         {products.length > 0 ? (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8">
               {products.map((product) => (
                 <ProductCard key={product.id} {...formatProductForCard(product)} />
               ))}
             </div>
           </>
         ) : (
-          <div className="text-center py-8 sm:py-16">
-            <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">📦</div>
-            <h3 className="text-lg sm:text-2xl font-semibold mb-1 sm:mb-2">No Products Yet</h3>
-            <p className="text-sm sm:text-base text-muted-foreground px-4">
+          <div className="text-center py-6 sm:py-8 md:py-12 lg:py-16">
+            <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-2 sm:mb-3 md:mb-4">📦</div>
+            <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-1 sm:mb-2">No Products Yet</h3>
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground px-2 sm:px-4">
               Products added through the admin panel will appear here.
             </p>
           </div>
