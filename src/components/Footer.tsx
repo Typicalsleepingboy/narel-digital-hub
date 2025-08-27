@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Instagram, Star, Shield, Zap, Download, Smartphone, Code, Globe, Mail, MapPin, Clock, Award, Users, CheckCircle } from "lucide-react";
+import { Heart, MessageCircle, Instagram, Star, Download, Smartphone, Code, Globe, Mail, MapPin, Clock, CheckCircle } from "lucide-react";
 import logo from "@/assets/narellogo.png";
 
 const Footer = () => {
