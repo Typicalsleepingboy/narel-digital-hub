@@ -23,6 +23,7 @@ interface Product {
   description: string | null;
   images: string[] | null;
   created_at: string;
+  product_type?: string;
   variants?: ProductVariant[];
 }
 
@@ -83,11 +84,12 @@ const ProductGrid = () => {
     id: product.id,
     name: product.name,
     price: product.price,
-    discount: product.discount, 
-    discount_percentage: product.discount_percentage, 
-    image: product.images && product.images.length > 0 
-      ? product.images[0] 
+    discount: product.discount,
+    discount_percentage: product.discount_percentage,
+    image: product.images && product.images.length > 0
+      ? product.images[0]
       : "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=300&fit=crop&crop=center",
+    product_type: product.product_type,
     variants: product.variants || []
   });
 

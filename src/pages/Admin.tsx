@@ -6,15 +6,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, Edit, LogIn, LogOut, X } from "lucide-react";
+import { Trash2, Plus, Edit, LogIn, LogOut, X, Smartphone, Globe, Code, Download} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@supabase/supabase-js";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { TablesInsert } from "@/integrations/supabase/types";
 
-interface ProductVariant {
+type VariantValue = string | number | boolean;
+
+interface AdminProductVariant {
   price_adjustment: any;
   id?: string;
-  product_id?: string; 
+  product_id?: string;
   variant_name: string;
   price: number;
   discount_percentage?: number;
@@ -22,39 +25,40 @@ interface ProductVariant {
   [key: string]: any;
 }
 
-type VariantValue = string | number | boolean;
-
-interface Product {
-  product_type: string;
+interface AdminProduct {
+  product_type: 'premium_app' | 'digital_service' | 'digital_product';
   discount_percentage: any;
   discount: any;
   price: any;
   id: string;
   name: string;
-  description: string;
-  images: string[];
+  description: string | null;
+  images: string[] | null;
   created_at: string;
+  updated_at: string;
   is_available: boolean;
-  variants?: ProductVariant[];
+  variants?: AdminProductVariant[];
 }
 
 interface DatabaseProduct {
   id: string;
   name: string;
   price: number;
-  discount: boolean;
-  discount_percentage?: number;
-  description: string;
-  images: string[];
+  discount: boolean | null;
+  discount_percentage?: number | null;
+  description: string | null;
+  images: string[] | null;
   created_at: string;
-  product_type: string;
+  updated_at: string;
+  product_type: 'premium_app' | 'digital_service' | 'digital_product';
+  is_available: boolean;
 }
 
 const Admin = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<AdminProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [authData, setAuthData] = useState({ email: "", password: "" });
   const { toast } = useToast();
@@ -63,14 +67,14 @@ const Admin = () => {
     name: "",
     description: "",
     images: [""],
-    productType: "digital_product",
+    productType: "digital_product" as 'premium_app' | 'digital_service' | 'digital_product',
     is_available: true,
-    variants: [{ 
-      variant_name: "", 
+    variants: [{
+      variant_name: "",
       price: 0,
       discount_percentage: 0,
-      is_available: true 
-    }] as ProductVariant[]
+      is_available: true
+    }] as AdminProductVariant[]
   });
 
   useEffect(() => {
@@ -113,8 +117,8 @@ const Admin = () => {
 
           return {
             ...product,
-            variants: variants || []
-          } as unknown as Product;
+            variants: (variants || []) as AdminProductVariant[]
+          } as unknown as AdminProduct;
         })
       );
 
@@ -174,9 +178,18 @@ const Admin = () => {
       });
       return;
     }
-    
+
+    if (!formData.name.trim()) {
+      toast({
+        title: "Error",
+        description: "Product name is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      const productData = {
+      const productData: TablesInsert<'products'> = {
         name: formData.name,
         description: formData.description,
         images: formData.images.filter(img => img.trim() !== ""),
@@ -222,10 +235,10 @@ const Admin = () => {
         const variantsData = validVariants.map(variant => ({
           product_id: productId,
           variant_name: variant.variant_name,
-         price: variant.price,
-         price_adjustment: variant.price_adjustment || 0,
-         discount_percentage: variant.discount_percentage || null,
-         is_available: variant.is_available
+          price: variant.price,
+          price_adjustment: Number(variant.price_adjustment) || 0,
+          discount_percentage: variant.discount_percentage || null,
+          is_available: variant.is_available
         }));
 
         const { error: variantsError } = await supabase
@@ -274,34 +287,34 @@ const Admin = () => {
     }
   };
 
-    const editProduct = (product: Product) => {
-    setEditingProduct(product);
-    setFormData({
-      name: product.name,
-      description: product.description || "",
-      images: product.images.length > 0 ? product.images : [""],
-      productType: product.product_type || "digital_product",
-      is_available: product.is_available,
-      variants: product.variants && product.variants.length > 0 
-        ? product.variants.map(v => ({ 
-            id: v.id,
-            product_id: v.product_id,
-            variant_name: v.variant_name, 
-            price: v.price,
-            price_adjustment: v.price_adjustment || 0,
-            discount_percentage: v.discount_percentage || 0,
-            is_available: v.is_available
-          }))
-        : [{ 
-            variant_name: "", 
-            price: 0, 
-            price_adjustment: 0,
-            discount_percentage: 0,
-            is_available: true 
-          }]
-    });
-    setShowForm(true);
-  }
+    const editProduct = (product: AdminProduct) => {
+      setEditingProduct(product);
+      setFormData({
+        name: product.name,
+        description: product.description || "",
+        images: product.images && product.images.length > 0 ? product.images : [""],
+        productType: product.product_type || "digital_product",
+        is_available: product.is_available,
+        variants: product.variants && product.variants.length > 0
+          ? product.variants.map(v => ({
+              id: v.id,
+              product_id: v.product_id,
+              variant_name: v.variant_name,
+              price: v.price,
+              price_adjustment: Number(v.price_adjustment) || 0,
+              discount_percentage: v.discount_percentage || 0,
+              is_available: v.is_available
+            }))
+          : [{
+              variant_name: "",
+              price: 0,
+              price_adjustment: 0,
+              discount_percentage: 0,
+              is_available: true
+            }]
+      });
+      setShowForm(true);
+    }
 
   const resetForm = () => {
     setFormData({
@@ -315,7 +328,7 @@ const Admin = () => {
         price: 0,
         discount_percentage: 0,
         is_available: true,
-        price_adjustment: undefined
+        price_adjustment: 0
       }]
     });
     setEditingProduct(null);
@@ -356,7 +369,7 @@ const Admin = () => {
     }));
   };
 
-  const updateVariant = (index: number, field: keyof ProductVariant, value: VariantValue) => {
+  const updateVariant = (index: number, field: keyof AdminProductVariant, value: VariantValue) => {
     setFormData(prev => ({
       ...prev,
       variants: prev.variants.map((variant, i) => 
@@ -370,6 +383,35 @@ const Admin = () => {
       ...prev,
       variants: prev.variants.filter((_, i) => i !== index)
     }));
+  };
+
+  const getProductTypeInfo = (productType?: string) => {
+    switch (productType) {
+      case 'premium_app':
+        return {
+          icon: Smartphone,
+          label: 'Premium App',
+          color: 'bg-gradient-to-r from-blue-500 to-purple-500'
+        };
+      case 'digital_service':
+        return {
+          icon: Globe,
+          label: 'Digital Service',
+          color: 'bg-gradient-to-r from-green-500 to-teal-500'
+        };
+      case 'digital_product':
+        return {
+          icon: Code,
+          label: 'Digital Product',
+          color: 'bg-gradient-to-r from-orange-500 to-red-500'
+        };
+      default:
+        return {
+          icon: Download,
+          label: 'Digital Product',
+          color: 'bg-gradient-to-r from-gray-500 to-gray-600'
+        };
+    }
   };
 
   if (isLoading) {
@@ -508,15 +550,6 @@ const Admin = () => {
                     </Select>
                   </div>
 
-                  <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                      rows={3}
-                    />
-                  </div>
                 </div>
 
                 {/* Product Variants */}
@@ -660,7 +693,21 @@ const Admin = () => {
                   )}
                   <div>
                     <h3 className="font-semibold text-lg">{product.name}</h3>
-                    <p className="text-primary font-bold">Rp {product.price.toLocaleString()}</p>
+                    {product.product_type && (
+                      <div className="flex items-center space-x-2 mb-2">
+                        {(() => {
+                          const typeInfo = getProductTypeInfo(product.product_type);
+                          const IconComponent = typeInfo.icon;
+                          return (
+                            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-white text-xs ${typeInfo.color}`}>
+                              <IconComponent className="w-3 h-3" />
+                              <span className="font-medium">{typeInfo.label}</span>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    )}
+                    <p className="text-primary font-bold">Rp {product.price.toLocaleString('id-ID')}</p>
                     {product.discount && product.discount_percentage && (
                       <span className="text-sm text-green-600">
                         Discount: {product.discount_percentage}%

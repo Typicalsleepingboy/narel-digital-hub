@@ -2,11 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, Zap, Download, Heart, Share2, Minus, Plus, ArrowLeft } from 'lucide-react';
+import { Shield, Zap, Download, Heart, Share2, Minus, Plus, ArrowLeft, Smartphone, Code, Globe } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -30,6 +27,7 @@ interface Product {
     description: string;
     images: string[];
     created_at: string;
+    product_type?: string;
     variants?: ProductVariant[];
 }
 
@@ -97,7 +95,7 @@ export default function ProductDetail() {
                         </div>
                     );
                 }
-                
+
                 // Handle bullet points with •
                 if (line.trim().startsWith('•')) {
                     return (
@@ -107,7 +105,7 @@ export default function ProductDetail() {
                         </div>
                     );
                 }
-                
+
                 // Handle section headers (lines ending with :)
                 if (line.trim().endsWith(':') && line.trim().length > 1) {
                     return (
@@ -116,12 +114,12 @@ export default function ProductDetail() {
                         </div>
                     );
                 }
-                
+
                 // Handle empty lines
                 if (line.trim() === '') {
                     return <div key={index} className="h-2"></div>;
                 }
-                
+
                 // Regular text
                 return (
                     <div key={index} className="mb-1">
@@ -129,6 +127,39 @@ export default function ProductDetail() {
                     </div>
                 );
             });
+    };
+
+    const getProductTypeInfo = (productType?: string) => {
+        switch (productType) {
+            case 'premium_app':
+                return {
+                    icon: Smartphone,
+                    label: 'Premium App',
+                    color: 'bg-gradient-to-r from-blue-500 to-purple-500',
+                    description: 'Premium aplikasi dengan fitur lengkap'
+                };
+            case 'digital_service':
+                return {
+                    icon: Globe,
+                    label: 'Digital Service',
+                    color: 'bg-gradient-to-r from-green-500 to-teal-500',
+                    description: 'Layanan digital profesional'
+                };
+            case 'digital_product':
+                return {
+                    icon: Code,
+                    label: 'Digital Product',
+                    color: 'bg-gradient-to-r from-orange-500 to-red-500',
+                    description: 'Produk digital berkualitas tinggi'
+                };
+            default:
+                return {
+                    icon: Download,
+                    label: 'Digital Product',
+                    color: 'bg-gradient-to-r from-gray-500 to-gray-600',
+                    description: 'Produk digital'
+                };
+        }
     };
 
     const calculatePrice = () => {
@@ -295,7 +326,26 @@ export default function ProductDetail() {
                                     <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent leading-tight">
                                         {product.name}
                                     </h1>
-                                    
+
+                                    {/* Product Type Badge */}
+                                    {product.product_type && (
+                                        <div className="flex items-center space-x-3">
+                                            {(() => {
+                                                const typeInfo = getProductTypeInfo(product.product_type);
+                                                const IconComponent = typeInfo.icon;
+                                                return (
+                                                    <div className={`flex items-center space-x-2 px-4 py-2 rounded-full text-white shadow-lg ${typeInfo.color}`}>
+                                                        <IconComponent className="w-4 h-4" />
+                                                        <span className="text-sm font-medium">{typeInfo.label}</span>
+                                                    </div>
+                                                );
+                                            })()}
+                                            <div className="text-sm text-muted-foreground">
+                                                {getProductTypeInfo(product.product_type).description}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Formatted Description */}
                                     <div className="text-base text-muted-foreground leading-relaxed max-w-2xl bg-muted/20 rounded-xl p-4">
                                         {formatDescription(product.description)}
