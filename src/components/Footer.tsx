@@ -105,7 +105,7 @@ const Footer = () => {
                   <MessageCircle className="w-5 h-5 text-green-500" />
                   <div>
                     <div className="font-medium">WhatsApp Support</div>
-                    <div className="text-xs">+62 899-217-3777</div>
+                    <div className="text-xs">+62 899-2173-777</div>
                   </div>
                 </a>
 
@@ -117,8 +117,8 @@ const Footer = () => {
                 >
                   <Heart className="w-5 h-5 text-indigo-500" />
                   <div>
-                    <div className="font-medium">Discord Community</div>
-                    <div className="text-xs">Join our community</div>
+                    <div className="font-medium">Discord Server</div>
+                    <div className="text-xs">Join our Server</div>
                   </div>
                 </a>
 
@@ -175,15 +175,15 @@ const Footer = () => {
       {/* Bottom Footer */}
       <div className="border-t border-border py-6 px-4">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-muted-foreground">
+          <div className="flex flex-col space-y-4">
+            <div className="flex flex-col sm:flex-row sm:justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-muted-foreground text-center">
               <p>© {new Date().getFullYear()} NareL Digital. All rights reserved.</p>
               <div className="flex items-center space-x-4">
                 <a href="#terms" className="hover:text-primary transition-colors">Terms of Service</a>
               </div>
             </div>
 
-            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row sm:justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4 text-sm text-muted-foreground text-center">
               <span>Developed and Partnership with</span>
               <a href="https://discord.gg/eACp5vMzZn" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                 Sleeping.Stu

@@ -28,9 +28,9 @@ const useCountUp = (end, duration = 2000) => {
 };
 
 const Hero = () => {
-  const products = useCountUp(1000);
-  const customers = useCountUp(50000);
-  const rating = useCountUp(49, 2000); 
+  const products = useCountUp(30);
+  const customers = useCountUp(5000);
+  const rating = useCountUp(49, 2000);
 
   return (
     <section id="home" className="pt-20 sm:pt-24 pb-12 sm:pb-16 px-4">

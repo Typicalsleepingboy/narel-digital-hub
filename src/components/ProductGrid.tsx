@@ -48,10 +48,11 @@ const ProductGrid = () => {
 
   const fetchProducts = async () => {
     try {
+      // Sort by creation date ascending (oldest first) so new products appear at bottom
       const { data: productsData, error: productsError } = await supabase
         .from('products')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
 
       if (productsError) throw productsError;
 
