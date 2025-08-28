@@ -96,7 +96,7 @@ const ProductGrid = () => {
 
   if (isLoading) {
     return (
-      <section id="products" className="py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4">
+      <section id="products" className="py-6 sm:py-8 md:py-12 lg:py-16 px-0.5 sm:px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
@@ -107,7 +107,7 @@ const ProductGrid = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-1 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8">
             {/* Loading skeleton */}
             {[...Array(6)].map((_, index) => (
               <div key={index} className="bg-card rounded-lg sm:rounded-xl md:rounded-2xl shadow-card overflow-hidden animate-pulse">
@@ -132,7 +132,7 @@ const ProductGrid = () => {
   }
 
   return (
-    <section id="products" className="py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4">
+    <section id="products" className="py-6 sm:py-8 md:py-12 lg:py-16 px-0.5 sm:px-4">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
@@ -145,7 +145,7 @@ const ProductGrid = () => {
 
         {products.length > 0 ? (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-1 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8">
               {products.map((product) => (
                 <ProductCard key={product.id} {...formatProductForCard(product)} />
               ))}
@@ -155,7 +155,7 @@ const ProductGrid = () => {
           <div className="text-center py-6 sm:py-8 md:py-12 lg:py-16">
             <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-2 sm:mb-3 md:mb-4">📦</div>
             <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-1 sm:mb-2">No Products Yet</h3>
-            <p className="text-xs sm:text-sm md:text-base text-muted-foreground px-2 sm:px-4">
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground px-2 sm:px-">
               Products added through the admin panel will appear here.
             </p>
           </div>
